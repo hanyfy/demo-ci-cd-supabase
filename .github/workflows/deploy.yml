@@ -1,0 +1,26 @@
+name: Deploy to Supabase Cloud
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Installer la CLI Supabase
+        run: npm install -g supabase
+
+      - name: Lier le projet
+        run: supabase link --project-ref ${{ secrets.SUPABASE_PROJECT_REF }} --access-token ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
+      - name: Pousser les migrations
+        run: supabase db push --access-token ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
+      - name: Déployer les Edge Functions
+        run: supabase functions deploy --project-ref ${{ secrets.SUPABASE_PROJECT_REF }} --access-token ${{ secrets.SUPABASE_ACCESS_TOKEN }}
